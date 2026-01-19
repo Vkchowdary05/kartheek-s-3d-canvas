@@ -40,6 +40,27 @@ export const projects: Project[] = [
     colors: { primary: "#6366F1", accent: "#8B5CF6" }
   },
   {
+    id: "exam-ready-mobile",
+    name: "Exam Ready Mobile",
+    tagline: "AI-Powered Exam Prep Flutter App",
+    description: "Multi-platform Flutter app for uploading, searching & analyzing past exam papers. Features on-device OCR, Groq LLM topic extraction, and Firebase backend.",
+    category: ["Mobile", "AI-Powered", "Full-Stack"],
+    techStack: ["Flutter", "Dart", "Firebase", "Google ML Kit", "Groq AI", "Cloudinary", "Riverpod"],
+    highlights: [
+      "On-device OCR with Google ML Kit",
+      "AI topic extraction via Groq LLM",
+      "Cross-platform (Android, iOS, Web)",
+      "Real-time Firestore search",
+      "Automated question paper pipeline"
+    ],
+    links: {
+      live: null,
+      github: "https://github.com/Vkchowdary05/exam-ready-13",
+      apk: "https://github.com/Vkchowdary05/exam-ready-13/releases/download/v1.0.0/app-release.apk"
+    },
+    colors: { primary: "#02569B", accent: "#6366F1" }
+  },
+  {
     id: "gym-remo",
     name: "Gym Remo",
     tagline: "Muscle-Based Fitness Tracker",

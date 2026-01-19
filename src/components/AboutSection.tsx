@@ -94,7 +94,7 @@ const AboutSection = () => {
             </p>
 
             <motion.a
-              href="https://res.cloudinary.com/dbtvbnqjt/raw/upload/kartheek_frontendintern_xzobdm"
+              href="https://drive.google.com/uc?export=download&id=1JCteJi8sQjZp1yxHO812nNoKuTmlVPKE"
               target="_blank"
               rel="noopener noreferrer"
               download

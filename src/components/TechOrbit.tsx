@@ -29,7 +29,7 @@ const TechOrbitItem = ({ tech, index }: { tech: TechItem; index: number }) => {
     if (!groupRef.current) return;
     const time = state.clock.elapsedTime;
     const angle = time * tech.speed + tech.offset;
-    
+
     groupRef.current.position.x = Math.cos(angle) * tech.radius;
     groupRef.current.position.z = Math.sin(angle) * tech.radius;
     groupRef.current.position.y = Math.sin(time * 0.5 + index) * 0.5;
@@ -50,7 +50,6 @@ const TechOrbitItem = ({ tech, index }: { tech: TechItem; index: number }) => {
         color={tech.color}
         anchorX="center"
         anchorY="middle"
-        font="/fonts/inter.woff"
       >
         {tech.name}
       </Text>

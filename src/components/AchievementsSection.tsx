@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Trophy, Rocket, Star, Smartphone, Globe, Code } from 'lucide-react';
 import { achievements } from '@/data/projects';
+import Achievements3D from './3d/achievements/Achievements3D';
 
 const iconMap: Record<string, React.ElementType> = {
   Trophy,
@@ -25,7 +26,7 @@ const CountUp = ({ target, suffix = "", duration = 2000 }: { target: number; suf
       if (!startTime) startTime = currentTime;
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       // Ease out
       const easeOut = 1 - Math.pow(1 - progress, 3);
       setCount(target * easeOut);
@@ -51,8 +52,11 @@ const AchievementsSection = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="achievements" className="py-24 relative" ref={ref}>
-      <div className="container mx-auto px-6">
+    <section id="achievements" className="py-24 relative overflow-hidden min-h-[500px]" ref={ref}>
+      {/* 3D Background */}
+      <Achievements3D />
+
+      <div className="container mx-auto px-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -81,7 +85,7 @@ const AchievementsSection = () => {
               >
                 <motion.div
                   className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center"
-                  style={{ 
+                  style={{
                     background: `${achievement.color}20`,
                     boxShadow: `0 0 0 0 ${achievement.color}40`,
                   }}
@@ -91,7 +95,7 @@ const AchievementsSection = () => {
                 >
                   <Icon size={28} style={{ color: achievement.color }} />
                 </motion.div>
-                <div 
+                <div
                   className="text-3xl font-bold mb-1"
                   style={{ color: achievement.color }}
                 >

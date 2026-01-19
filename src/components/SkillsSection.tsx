@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import Skills3D from './3d/skills/Skills3D';
 
 const skillCategories = [
   {
@@ -39,10 +40,13 @@ const SkillsSection = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="skills" className="py-24 relative" ref={ref}>
-      {/* Background */}
-      <div className="absolute top-1/3 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/3 left-0 w-72 h-72 bg-accent/10 rounded-full blur-3xl" />
+    <section id="skills" className="py-24 relative overflow-hidden min-h-[700px]" ref={ref}>
+      {/* 3D Background */}
+      <Skills3D />
+
+      {/* Gradient overlays */}
+      <div className="absolute top-1/3 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/3 left-0 w-72 h-72 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10">
         <motion.div
@@ -86,8 +90,8 @@ const SkillsSection = () => {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={isInView ? { opacity: 1, scale: 1 } : {}}
                     transition={{ duration: 0.3, delay: categoryIndex * 0.1 + index * 0.05 }}
-                    whileHover={{ 
-                      scale: 1.1, 
+                    whileHover={{
+                      scale: 1.1,
                       boxShadow: `0 0 20px ${category.color}40`,
                     }}
                     className="px-3 py-1.5 rounded-lg text-sm font-medium cursor-default transition-all"

@@ -3,6 +3,7 @@ import { useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { MapPin, GraduationCap, Download, User } from 'lucide-react';
 import { skills } from '@/data/projects';
+import About3D from './3d/about/About3D';
 
 const SkillBar = ({ name, level, delay }: { name: string; level: number; delay: number }) => {
   const ref = useRef(null);
@@ -34,10 +35,13 @@ const AboutSection = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="about" className="py-24 relative" ref={ref}>
-      {/* Background decoration */}
-      <div className="absolute top-1/2 left-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl -translate-y-1/2" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" />
+    <section id="about" className="py-24 relative overflow-hidden min-h-[700px]" ref={ref}>
+      {/* 3D Background */}
+      <About3D />
+
+      {/* Gradient decorations */}
+      <div className="absolute top-1/2 left-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10">
         <motion.div

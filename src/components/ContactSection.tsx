@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import Contact3D from './3d/contact/Contact3D';
 
 const contactInfo = [
   { icon: Mail, label: "Email", value: "papasanikarthik@gmail.com", link: "mailto:papasanikarthik@gmail.com" },
@@ -30,12 +31,46 @@ const ContactSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast.success('Message sent successfully! I\'ll get back to you soon.');
-    setFormData({ name: '', email: '', subject: '', message: '' });
-    setIsSubmitting(false);
+    try {
+      // Using Web3Forms API - free email service for static sites
+      // Get your access key at https://web3forms.com/ (free, no signup required for basic use)
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          access_key: '05abcc34-eb4d-4157-8330-6152a8517fd1', // Web3Forms access key
+          from_name: formData.name,
+          email: formData.email,
+          subject: `Portfolio Contact: ${formData.subject}`,
+          message: formData.message,
+          to: 'papasanikarthik@gmail.com',
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success('Message sent successfully! I\'ll get back to you soon.');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        // Fallback to mailto if Web3Forms not configured
+        const mailtoLink = `mailto:papasanikarthik@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
+        window.open(mailtoLink, '_blank');
+        toast.success('Opening your email client to send the message.');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      }
+    } catch (error) {
+      // Fallback to mailto link
+      const mailtoLink = `mailto:papasanikarthik@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
+      window.open(mailtoLink, '_blank');
+      toast.success('Opening your email client to send the message.');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -46,10 +81,13 @@ const ContactSection = () => {
   };
 
   return (
-    <section id="contact" className="py-24 relative" ref={ref}>
-      {/* Background */}
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-      <div className="absolute top-0 right-1/4 w-72 h-72 bg-secondary/10 rounded-full blur-3xl" />
+    <section id="contact" className="py-24 relative overflow-hidden min-h-[800px]" ref={ref}>
+      {/* 3D Background */}
+      <Contact3D />
+
+      {/* Gradient overlays */}
+      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-72 h-72 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10">
         <motion.div
@@ -179,7 +217,7 @@ const ContactSection = () => {
                 className="glass-card p-4"
               >
                 {item.link ? (
-                  <a 
+                  <a
                     href={item.link}
                     className="flex items-center gap-4 group"
                   >

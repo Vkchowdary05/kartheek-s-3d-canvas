@@ -1,8 +1,15 @@
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { ChevronDown, Github, Linkedin, Mail, Sparkles } from 'lucide-react';
-import Hero3D from './Hero3D';
 
 const HeroSection = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Trigger fade-in on mount
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   const scrollToAbout = () => {
     const element = document.getElementById('about');
     if (element) {
@@ -11,148 +18,120 @@ const HeroSection = () => {
   };
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Soft gradient background */}
-      <div className="absolute inset-0 bg-gradient-radial from-[#1e1b4b]/40 via-[#0f0f23] to-[#0a0a14]" />
+    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+      {/* Soft gradient background - no 3D */}
+      <div className="absolute inset-0 bg-gradient-to-b from-accent/20 via-background to-background" />
 
-      {/* 3D Background */}
-      <Hero3D />
-
-      {/* Gradient Overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-transparent to-background/80 pointer-events-none z-10" />
-
-      {/* Soft animated glow orbs */}
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-      <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-secondary/10 rounded-full blur-[140px] animate-pulse" style={{ animationDelay: '1.5s' }} />
-      <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-accent/8 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2.5s' }} />
+      {/* Subtle decorative circles */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-secondary/5 rounded-full blur-3xl" />
 
       {/* Content */}
-      <div className="relative z-20 text-center px-6 max-w-4xl mx-auto">
+      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
         {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-          className="mb-6"
+        <div
+          className={`mb-8 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          style={{ transitionDelay: '200ms' }}
         >
-          <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/8 border border-primary/20 text-primary text-sm font-medium backdrop-blur-sm">
-            <Sparkles size={14} className="animate-pulse" />
+          <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent/50 border border-border text-foreground text-sm font-medium">
+            <Sparkles size={14} className="text-primary" />
             2× Smart India Hackathon Finalist
-            <Sparkles size={14} className="animate-pulse" />
+            <Sparkles size={14} className="text-primary" />
           </span>
-        </motion.div>
+        </div>
 
-        {/* Main Title with soft gradient */}
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
-          className="text-5xl md:text-7xl lg:text-8xl font-bold mb-4 tracking-tight"
+        {/* Main Title */}
+        <h1
+          className={`fluid-hero font-bold mb-6 tracking-tight text-foreground transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          style={{ transitionDelay: '400ms' }}
         >
-          <span className="bg-gradient-to-r from-slate-100 via-primary/90 to-slate-100 bg-clip-text text-transparent">
-            Venkata Kartheek
-          </span>
-        </motion.h1>
+          Venkata Kartheek
+        </h1>
 
-        {/* Subtitle with gentle glow */}
-        <motion.h2
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
-          className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-4"
+        {/* Subtitle */}
+        <h2
+          className={`fluid-subtitle font-medium mb-6 text-primary transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          style={{ transitionDelay: '600ms' }}
         >
-          <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
-            Full-Stack Developer
-          </span>
-        </motion.h2>
+          Full-Stack Developer
+        </h2>
 
         {/* Description */}
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
-          className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
+        <p
+          className={`fluid-body text-muted-foreground mb-12 max-w-2xl mx-auto transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          style={{ transitionDelay: '800ms' }}
         >
           Building Production-Ready Applications with{' '}
-          <span className="text-[#93c5fd] font-medium">React</span>,{' '}
-          <span className="text-[#86efac] font-medium">Node.js</span>,{' '}
-          <span className="text-[#93c5fd] font-medium">Flutter</span> &{' '}
-          <span className="text-[#f0abfc] font-medium">AI</span>
-        </motion.p>
+          <span className="text-primary font-medium">React</span>,{' '}
+          <span className="text-primary font-medium">Node.js</span>,{' '}
+          <span className="text-primary font-medium">Flutter</span> &{' '}
+          <span className="text-primary font-medium">AI</span>
+        </p>
 
         {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 1, ease: "easeOut" }}
-          className="flex flex-wrap items-center justify-center gap-4 mb-12"
+        <div
+          className={`flex flex-wrap items-center justify-center gap-4 mb-14 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          style={{ transitionDelay: '1000ms' }}
         >
-          <motion.a
+          <a
             href="#projects"
             onClick={(e) => { e.preventDefault(); document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }); }}
-            whileHover={{ scale: 1.03, boxShadow: "0 0 35px rgba(167, 139, 250, 0.4)" }}
-            whileTap={{ scale: 0.97 }}
-            className="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-primary to-secondary text-primary-foreground font-semibold text-lg transition-all overflow-hidden"
+            className="btn-primary text-lg"
           >
-            <span className="relative z-10">View My Work</span>
-          </motion.a>
+            View My Work
+          </a>
 
-          <motion.a
+          <a
             href="#contact"
             onClick={(e) => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }}
-            whileHover={{ scale: 1.03, borderColor: 'rgba(167, 139, 250, 0.6)' }}
-            whileTap={{ scale: 0.97 }}
-            className="px-8 py-4 rounded-2xl border-2 border-primary/30 text-foreground font-semibold text-lg hover:bg-primary/8 transition-all backdrop-blur-sm"
+            className="btn-secondary text-lg"
           >
             Get In Touch
-          </motion.a>
-        </motion.div>
+          </a>
+        </div>
 
         {/* Social Links */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.2, ease: "easeOut" }}
-          className="flex items-center justify-center gap-5"
+        <div
+          className={`flex items-center justify-center gap-4 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          style={{ transitionDelay: '1200ms' }}
         >
           {[
-            { icon: Github, href: "https://github.com/Vkchowdary05", label: "GitHub", color: "#e2e8f0" },
-            { icon: Linkedin, href: "https://linkedin.com/in/kartheek-chowdhary", label: "LinkedIn", color: "#93c5fd" },
-            { icon: Mail, href: "mailto:papasanikarthik@gmail.com", label: "Email", color: "#f0abfc" },
-          ].map(({ icon: Icon, href, label, color }) => (
-            <motion.a
+            { icon: Github, href: "https://github.com/Vkchowdary05", label: "GitHub" },
+            { icon: Linkedin, href: "https://linkedin.com/in/kartheek-chowdhary", label: "LinkedIn" },
+            { icon: Mail, href: "mailto:papasanikarthik@gmail.com", label: "Email" },
+          ].map(({ icon: Icon, href, label }) => (
+            <a
               key={label}
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              whileHover={{ scale: 1.15, y: -4 }}
-              whileTap={{ scale: 0.95 }}
-              className="p-4 rounded-2xl bg-muted/40 backdrop-blur-sm text-muted-foreground hover:text-white transition-all border border-white/5 hover:border-primary/25"
+              className="p-4 rounded-xl bg-card border border-border text-muted-foreground hover:text-primary hover:border-primary soft-hover"
               aria-label={label}
             >
               <Icon size={22} />
-            </motion.a>
+            </a>
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* Scroll Indicator */}
-      <motion.button
+      <button
         onClick={scrollToAbout}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.8 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-muted-foreground hover:text-primary transition-colors"
+        className={`absolute bottom-8 left-1/2 -translate-x-1/2 text-muted-foreground hover:text-primary transition-colors ${isVisible ? 'opacity-100' : 'opacity-0'
+          }`}
+        style={{ transitionDelay: '1500ms' }}
       >
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-          className="flex flex-col items-center gap-2"
-        >
-          <span className="text-xs uppercase tracking-widest opacity-60">Scroll</span>
-          <ChevronDown size={24} />
-        </motion.div>
-      </motion.button>
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-xs uppercase tracking-widest">Scroll</span>
+          <ChevronDown size={24} className="animate-gentle-pulse" />
+        </div>
+      </button>
     </section>
   );
 };

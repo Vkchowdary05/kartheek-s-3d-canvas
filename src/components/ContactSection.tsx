@@ -1,8 +1,6 @@
-import { useState, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import Contact3D from './3d/contact/Contact3D';
 
 const contactInfo = [
   { icon: Mail, label: "Email", value: "papasanikarthik@gmail.com", link: "mailto:papasanikarthik@gmail.com" },
@@ -11,9 +9,9 @@ const contactInfo = [
 ];
 
 const socialLinks = [
-  { icon: Github, name: "GitHub", url: "https://github.com/Vkchowdary05", color: "#333333" },
-  { icon: Linkedin, name: "LinkedIn", url: "https://linkedin.com/in/kartheek-chowdhary", color: "#0A66C2" },
-  { icon: Mail, name: "Email", url: "mailto:papasanikarthik@gmail.com", color: "#EA4335" },
+  { icon: Github, name: "GitHub", url: "https://github.com/Vkchowdary05" },
+  { icon: Linkedin, name: "LinkedIn", url: "https://linkedin.com/in/kartheek-chowdhary" },
+  { icon: Mail, name: "Email", url: "mailto:papasanikarthik@gmail.com" },
 ];
 
 const ContactSection = () => {
@@ -24,16 +22,29 @@ const ContactSection = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: '-50px' }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // Using Web3Forms API - free email service for static sites
-      // Get your access key at https://web3forms.com/ (free, no signup required for basic use)
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: {
@@ -41,7 +52,7 @@ const ContactSection = () => {
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          access_key: '05abcc34-eb4d-4157-8330-6152a8517fd1', // Web3Forms access key
+          access_key: '05abcc34-eb4d-4157-8330-6152a8517fd1',
           from_name: formData.name,
           email: formData.email,
           subject: `Portfolio Contact: ${formData.subject}`,
@@ -56,14 +67,12 @@ const ContactSection = () => {
         toast.success('Message sent successfully! I\'ll get back to you soon.');
         setFormData({ name: '', email: '', subject: '', message: '' });
       } else {
-        // Fallback to mailto if Web3Forms not configured
         const mailtoLink = `mailto:papasanikarthik@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
         window.open(mailtoLink, '_blank');
         toast.success('Opening your email client to send the message.');
         setFormData({ name: '', email: '', subject: '', message: '' });
       }
     } catch (error) {
-      // Fallback to mailto link
       const mailtoLink = `mailto:papasanikarthik@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
       window.open(mailtoLink, '_blank');
       toast.success('Opening your email client to send the message.');
@@ -81,38 +90,32 @@ const ContactSection = () => {
   };
 
   return (
-    <section id="contact" className="py-24 relative overflow-hidden min-h-[800px]" ref={ref}>
-      {/* 3D Background */}
-      <Contact3D />
-
-      {/* Gradient overlays */}
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-0 right-1/4 w-72 h-72 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+    <section id="contact" className="section-calm relative overflow-hidden" ref={ref}>
+      {/* Subtle decorative elements */}
+      <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-1/4 w-64 h-64 bg-secondary/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+        <div
+          className={`text-center mb-16 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Get In <span className="gradient-text">Touch</span>
+          <h2 className="fluid-section font-bold mb-4 text-foreground">
+            Get In <span className="text-primary">Touch</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Have a project in mind or want to discuss opportunities? Let's connect!
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid lg:grid-cols-5 gap-12">
           {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-3"
+          <div
+            className={`lg:col-span-3 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              }`}
+            style={{ transitionDelay: '200ms' }}
           >
-            <form onSubmit={handleSubmit} className="glass-card p-8 space-y-6">
+            <form onSubmit={handleSubmit} className="calm-card p-8 space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
@@ -125,7 +128,7 @@ const ContactSection = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground"
+                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground"
                     placeholder="John Doe"
                   />
                 </div>
@@ -140,7 +143,7 @@ const ContactSection = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground"
+                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -157,7 +160,7 @@ const ContactSection = () => {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground"
+                  className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground"
                   placeholder="Internship Opportunity"
                 />
               </div>
@@ -173,17 +176,15 @@ const ContactSection = () => {
                   onChange={handleChange}
                   required
                   rows={5}
-                  className="w-full px-4 py-3 rounded-lg bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground resize-none"
+                  className="w-full px-4 py-3 rounded-lg bg-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground resize-none"
                   placeholder="Tell me about your opportunity..."
                 />
               </div>
 
-              <motion.button
+              <button
                 type="submit"
                 disabled={isSubmitting}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full py-4 rounded-lg bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 transition-all hover:opacity-90 disabled:opacity-50"
+                className="w-full py-4 rounded-lg btn-primary flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <>
@@ -196,33 +197,27 @@ const ContactSection = () => {
                     Send Message
                   </>
                 )}
-              </motion.button>
+              </button>
             </form>
-          </motion.div>
+          </div>
 
           {/* Contact Info & Social */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="lg:col-span-2 space-y-6"
+          <div
+            className={`lg:col-span-2 space-y-4 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              }`}
+            style={{ transitionDelay: '400ms' }}
           >
             {/* Contact Info Cards */}
             {contactInfo.map((item, index) => (
-              <motion.div
+              <div
                 key={item.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
-                className="glass-card p-4"
+                className="calm-card p-4"
+                style={{ transitionDelay: `${500 + index * 100}ms` }}
               >
                 {item.link ? (
-                  <a
-                    href={item.link}
-                    className="flex items-center gap-4 group"
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <item.icon size={24} className="text-primary" />
+                  <a href={item.link} className="flex items-center gap-4 group">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <item.icon size={22} className="text-primary" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">{item.label}</p>
@@ -233,8 +228,8 @@ const ContactSection = () => {
                   </a>
                 ) : (
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <item.icon size={24} className="text-primary" />
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <item.icon size={22} className="text-primary" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">{item.label}</p>
@@ -242,33 +237,28 @@ const ContactSection = () => {
                     </div>
                   </div>
                 )}
-              </motion.div>
+              </div>
             ))}
 
             {/* Social Links */}
-            <div className="glass-card p-6">
+            <div className="calm-card p-6">
               <h3 className="text-lg font-semibold text-foreground mb-4">Connect with me</h3>
               <div className="flex flex-wrap gap-3">
                 {socialLinks.map((social) => (
-                  <motion.a
+                  <a
                     key={social.name}
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    whileHover={{ scale: 1.1, y: -3 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-12 h-12 rounded-xl flex items-center justify-center transition-all"
-                    style={{
-                      background: `${social.color}20`,
-                    }}
+                    className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 soft-hover"
                     title={social.name}
                   >
-                    <social.icon size={22} style={{ color: social.color }} />
-                  </motion.a>
+                    <social.icon size={20} />
+                  </a>
                 ))}
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

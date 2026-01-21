@@ -1,8 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
 import { Trophy, Rocket, Star, Smartphone, Globe, Code } from 'lucide-react';
 import { achievements } from '@/data/projects';
-import Achievements3D from './3d/achievements/Achievements3D';
 
 const iconMap: Record<string, React.ElementType> = {
   Trophy,
@@ -13,15 +11,15 @@ const iconMap: Record<string, React.ElementType> = {
   Code,
 };
 
-const CountUp = ({ target, suffix = "", duration = 2000 }: { target: number; suffix?: string; duration?: number }) => {
+const CountUp = ({ target, suffix = "", isVisible }: { target: number; suffix?: string; isVisible: boolean }) => {
   const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
 
   useEffect(() => {
-    if (!isInView) return;
+    if (!isVisible) return;
 
+    const duration = 2000;
     let startTime: number;
+
     const animate = (currentTime: number) => {
       if (!startTime) startTime = currentTime;
       const elapsed = currentTime - startTime;
@@ -37,10 +35,10 @@ const CountUp = ({ target, suffix = "", duration = 2000 }: { target: number; suf
     };
 
     requestAnimationFrame(animate);
-  }, [isInView, target, duration]);
+  }, [isVisible, target]);
 
   return (
-    <span ref={ref}>
+    <span>
       {Number.isInteger(target) ? Math.round(count) : count.toFixed(1)}
       {suffix}
     </span>
@@ -48,66 +46,62 @@ const CountUp = ({ target, suffix = "", duration = 2000 }: { target: number; suf
 };
 
 const AchievementsSection = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const ref = useRef<HTMLElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: '-50px' }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section id="achievements" className="py-24 relative overflow-hidden min-h-[500px]" ref={ref}>
-      {/* 3D Background */}
-      <Achievements3D />
-
+    <section id="achievements" className="section-calm relative overflow-hidden" ref={ref}>
       <div className="container mx-auto px-6 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+        <div
+          className={`text-center mb-16 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Key <span className="gradient-text">Achievements</span>
+          <h2 className="fluid-section font-bold mb-4 text-foreground">
+            Key <span className="text-primary">Achievements</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Milestones and accomplishments throughout my journey
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {achievements.map((achievement, index) => {
             const Icon = iconMap[achievement.icon] || Trophy;
             return (
-              <motion.div
+              <div
                 key={achievement.label}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -8, scale: 1.05 }}
-                className="glass-card p-6 text-center group"
+                className={`calm-card p-5 text-center transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                  }`}
+                style={{ transitionDelay: `${200 + index * 100}ms` }}
               >
-                <motion.div
-                  className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center"
-                  style={{
-                    background: `${achievement.color}20`,
-                    boxShadow: `0 0 0 0 ${achievement.color}40`,
-                  }}
-                  whileHover={{
-                    boxShadow: `0 0 30px ${achievement.color}40`,
-                  }}
-                >
-                  <Icon size={28} style={{ color: achievement.color }} />
-                </motion.div>
-                <div
-                  className="text-3xl font-bold mb-1"
-                  style={{ color: achievement.color }}
-                >
-                  <CountUp target={achievement.count} suffix={achievement.suffix || ""} />
+                <div className="w-12 h-12 rounded-xl mx-auto mb-4 flex items-center justify-center bg-primary/10">
+                  <Icon size={24} className="text-primary" />
                 </div>
-                <div className="text-sm font-semibold text-foreground mb-1">
+                <div className="text-2xl font-bold mb-1 text-primary">
+                  <CountUp target={achievement.count} suffix={achievement.suffix || ""} isVisible={isVisible} />
+                </div>
+                <div className="text-sm font-medium text-foreground mb-1">
                   {achievement.label}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {achievement.description}
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>

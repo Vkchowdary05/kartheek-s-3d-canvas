@@ -1,54 +1,39 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ExternalLink, Github, Download, ArrowRight } from 'lucide-react';
+import { ExternalLink, Github, Download, ArrowRight, ArrowLeft } from 'lucide-react';
 import type { Project } from '@/data/projects';
 
 interface ProjectCardProps {
   project: Project;
   index: number;
+  isVisible: boolean;
 }
 
-const ProjectCard = ({ project, index }: ProjectCardProps) => {
+const ProjectCard = ({ project, index, isVisible }: ProjectCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      viewport={{ once: true, margin: "-50px" }}
-      className="perspective-1000 h-[450px]"
+    <div
+      className={`h-[420px] transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      style={{ transitionDelay: `${200 + index * 100}ms` }}
     >
-      <motion.div
-        className="relative w-full h-full preserve-3d cursor-pointer"
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
-        onClick={() => setIsFlipped(!isFlipped)}
+      <div
+        className={`relative w-full h-full transition-transform duration-700 ${isFlipped ? '[transform:rotateY(180deg)]' : ''
+          }`}
+        style={{ transformStyle: 'preserve-3d' }}
       >
         {/* Front of Card */}
-        <div className="absolute inset-0 backface-hidden">
-          <div 
-            className="h-full glass-card p-6 flex flex-col overflow-hidden group"
-            style={{
-              borderColor: `${project.colors.primary}20`,
-            }}
-          >
-            {/* Glow effect */}
-            <div 
-              className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"
-              style={{ background: project.colors.primary }}
-            />
-
+        <div
+          className="absolute inset-0 backface-hidden cursor-pointer"
+          onClick={() => setIsFlipped(true)}
+        >
+          <div className="h-full calm-card p-6 flex flex-col">
             {/* Category badges */}
             <div className="flex flex-wrap gap-2 mb-4">
               {project.category.slice(0, 2).map((cat) => (
                 <span
                   key={cat}
-                  className="px-2 py-1 text-xs font-medium rounded-full"
-                  style={{
-                    background: `${project.colors.primary}20`,
-                    color: project.colors.primary,
-                  }}
+                  className="px-2 py-1 text-xs font-medium rounded-md bg-primary/10 text-primary"
                 >
                   {cat}
                 </span>
@@ -57,12 +42,12 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
 
             {/* Project name */}
             <h3 className="text-xl font-bold text-foreground mb-2">{project.name}</h3>
-            <p className="text-sm font-medium mb-4" style={{ color: project.colors.accent }}>
+            <p className="text-sm font-medium text-primary mb-4">
               {project.tagline}
             </p>
 
             {/* Description */}
-            <p className="text-muted-foreground text-sm leading-relaxed mb-4 flex-grow line-clamp-3">
+            <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-grow line-clamp-3">
               {project.description}
             </p>
 
@@ -71,20 +56,20 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
               {project.techStack.slice(0, 4).map((tech) => (
                 <span
                   key={tech}
-                  className="px-2 py-1 text-xs bg-muted/50 text-muted-foreground rounded-md font-mono"
+                  className="px-2 py-1 text-xs bg-muted text-muted-foreground rounded-md font-mono"
                 >
                   {tech}
                 </span>
               ))}
               {project.techStack.length > 4 && (
-                <span className="px-2 py-1 text-xs bg-muted/50 text-muted-foreground rounded-md">
+                <span className="px-2 py-1 text-xs bg-muted text-muted-foreground rounded-md">
                   +{project.techStack.length - 4}
                 </span>
               )}
             </div>
 
             {/* Click hint */}
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mt-auto pt-4 border-t border-border/50">
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mt-auto pt-4 border-t border-border">
               <span>Click for details</span>
               <ArrowRight size={14} />
             </div>
@@ -92,27 +77,31 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
         </div>
 
         {/* Back of Card */}
-        <div className="absolute inset-0 backface-hidden rotate-y-180">
-          <div 
-            className="h-full glass-card p-6 flex flex-col"
-            style={{
-              borderColor: `${project.colors.primary}20`,
-            }}
-          >
-            <h3 className="text-xl font-bold text-foreground mb-4">{project.name}</h3>
+        <div
+          className="absolute inset-0 backface-hidden [transform:rotateY(180deg)] cursor-pointer"
+          onClick={() => setIsFlipped(false)}
+        >
+          <div className="h-full calm-card p-6 flex flex-col">
+            {/* Back button */}
+            <button
+              className="flex items-center gap-1 text-sm text-muted-foreground mb-4 hover:text-primary transition-colors"
+              onClick={(e) => { e.stopPropagation(); setIsFlipped(false); }}
+            >
+              <ArrowLeft size={14} />
+              Back
+            </button>
+
+            <h3 className="text-lg font-bold text-foreground mb-4">{project.name}</h3>
 
             {/* Highlights */}
             <div className="flex-grow mb-4">
-              <h4 className="text-sm font-semibold text-muted-foreground mb-2 uppercase tracking-wide">
+              <h4 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
                 Key Features
               </h4>
               <ul className="space-y-2">
                 {project.highlights.slice(0, 4).map((highlight, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-foreground">
-                    <span 
-                      className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
-                      style={{ background: project.colors.primary }}
-                    />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
                     {highlight}
                   </li>
                 ))}
@@ -128,7 +117,7 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
                 {project.techStack.map((tech) => (
                   <span
                     key={tech}
-                    className="px-2 py-0.5 text-xs bg-muted/50 text-muted-foreground rounded font-mono"
+                    className="px-2 py-0.5 text-xs bg-muted text-muted-foreground rounded font-mono"
                   >
                     {tech}
                   </span>
@@ -137,18 +126,14 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
             </div>
 
             {/* Action buttons */}
-            <div className="flex gap-3 mt-auto pt-4 border-t border-border/50">
+            <div className="flex gap-3 mt-auto pt-4 border-t border-border">
               {project.links.live && (
                 <a
                   href={project.links.live}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all hover:opacity-90"
-                  style={{
-                    background: project.colors.primary,
-                    color: '#fff',
-                  }}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground soft-hover"
                 >
                   <ExternalLink size={14} />
                   Live Demo
@@ -160,7 +145,7 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-muted text-foreground text-sm font-medium transition-all hover:bg-muted/80"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-card border border-border text-foreground text-sm font-medium soft-hover"
                 >
                   <Github size={14} />
                   GitHub
@@ -172,7 +157,7 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-accent text-accent-foreground text-sm font-medium transition-all hover:opacity-90"
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-secondary text-secondary-foreground text-sm font-medium soft-hover"
                 >
                   <Download size={14} />
                   APK
@@ -181,8 +166,8 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
             </div>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
 

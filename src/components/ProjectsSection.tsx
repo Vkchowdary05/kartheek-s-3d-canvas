@@ -1,81 +1,85 @@
-import { useState, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
 import { projects } from '@/data/projects';
 import ProjectCard from './ProjectCard';
-import Projects3D from './3d/projects/Projects3D';
 
 const filters = ["All", "Web", "Mobile", "Full-Stack", "AI-Powered"];
 
 const ProjectsSection = () => {
   const [activeFilter, setActiveFilter] = useState("All");
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: '-50px' }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
 
   const filteredProjects = activeFilter === "All"
     ? projects
     : projects.filter(p => p.category.includes(activeFilter));
 
   return (
-    <section id="projects" className="py-24 relative overflow-hidden min-h-[800px]" ref={ref}>
-      {/* 3D Background */}
-      <Projects3D />
-
-      {/* Gradient overlays */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+    <section id="projects" className="section-calm relative overflow-hidden" ref={ref}>
+      {/* Subtle decorative gradient */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/3 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-6 relative z-10">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+        <div
+          className={`text-center mb-12 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Featured <span className="gradient-text">Projects</span>
+          <h2 className="fluid-section font-bold mb-4 text-foreground">
+            Featured <span className="text-primary">Projects</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-10">
             Production-Ready Applications Deployed to Web & Mobile
           </p>
 
           {/* Filters */}
           <div className="flex flex-wrap justify-center gap-3">
             {filters.map((filter) => (
-              <motion.button
+              <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeFilter === filter
-                  ? 'bg-primary text-primary-foreground glow-primary'
-                  : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${activeFilter === filter
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-card border border-border text-muted-foreground hover:bg-muted hover:text-foreground'
                   }`}
               >
                 {filter}
-              </motion.button>
+              </button>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* Project Grid */}
-        <motion.div
-          layout
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((project, index) => (
-            <ProjectCard key={project.id} project={project} index={index} />
+            <ProjectCard
+              key={project.id}
+              project={project}
+              index={index}
+              isVisible={isVisible}
+            />
           ))}
-        </motion.div>
+        </div>
 
         {/* Empty state */}
         {filteredProjects.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-16"
-          >
+          <div className="text-center py-16">
             <p className="text-muted-foreground">No projects found for this category.</p>
-          </motion.div>
+          </div>
         )}
       </div>
     </section>
